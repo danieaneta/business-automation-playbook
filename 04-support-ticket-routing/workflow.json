@@ -1,0 +1,115 @@
+{
+  "name": "04 - Support Ticket Routing",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "support-ticket",
+        "responseMode": "onReceived",
+        "options": {}
+      },
+      "id": "c4a1f004-0001-4004-8004-000000000001",
+      "name": "Ticket Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [240, 320],
+      "webhookId": "support-ticket"
+    },
+    {
+      "parameters": {
+        "language": "python",
+        "pythonCode": "# Mirrors src/classifier.py + src/routing.py.\n# In production, swap this for a structured claude-opus-4-8 call (see .env.example) that\n# returns the same {topic, urgency, sentiment} verdict; keep these rules as a fallback.\nt = items[0]['json']\ntext = ((t.get('subject') or '') + ' ' + (t.get('body') or '')).lower()\ntopics = {\n  'billing': ['invoice','charge','refund','payment','billing','subscription','pricing'],\n  'technical': ['error','bug','crash','outage','down','broken','fails','500','login'],\n  'account': ['password','account','access','permission','login','reset','locked'],\n  'sales': ['demo','quote','upgrade','plan','buy','purchase','trial','sales'],\n}\nbest, best_hits = 'general', 0\nfor name, kws in topics.items():\n    hits = sum(1 for k in kws if k in text)\n    if hits > best_hits: best, best_hits = name, hits\nhigh = ['urgent','asap','outage','down','critical','emergency','immediately']\nlow = ['whenever','no rush','no hurry','low priority','not urgent','someday']\nif any(s in text for s in high): urgency = 'high'\nelif any(s in text for s in low): urgency = 'low'\nelse: urgency = 'normal'\nqueue_map = {'billing':'billing-queue','technical':'tech-support-queue','account':'account-queue','sales':'sales-queue','general':'triage-queue'}\nsla = {'high':60,'normal':480,'low':1440}[urgency]\nqueue = 'oncall-pager' if urgency == 'high' else queue_map[best]\nreturn [{'json': {**t, 'topic': best, 'priority': urgency, 'queue': queue, 'sla_minutes': sla}}]"
+      },
+      "id": "c4a1f004-0002-4004-8004-000000000002",
+      "name": "Classify Ticket",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [480, 320]
+    },
+    {
+      "parameters": {
+        "dataType": "string",
+        "value1": "={{ $json[\"priority\"] }}",
+        "rules": {
+          "rules": [
+            { "value2": "high", "output": 0 },
+            { "value2": "normal", "output": 1 },
+            { "value2": "low", "output": 2 }
+          ]
+        }
+      },
+      "id": "c4a1f004-0003-4004-8004-000000000003",
+      "name": "Switch on Priority",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 1,
+      "position": [720, 320]
+    },
+    {
+      "parameters": {
+        "select": "channel",
+        "channelId": "oncall-alerts",
+        "text": "=🚨 HIGH priority ticket {{ $json[\"id\"] }} ({{ $json[\"topic\"] }}) — paging on-call. SLA 60 min."
+      },
+      "id": "c4a1f004-0004-4004-8004-000000000004",
+      "name": "Page On-Call (high)",
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2,
+      "position": [980, 160],
+      "notesInFlow": true,
+      "notes": "High urgency -> page on-call engineer + open ticket in oncall-pager queue."
+    },
+    {
+      "parameters": {
+        "resource": "ticket",
+        "operation": "create",
+        "additionalFields": {
+          "group": "={{ $json[\"queue\"] }}",
+          "priority": "normal"
+        }
+      },
+      "id": "c4a1f004-0005-4004-8004-000000000005",
+      "name": "Route to Queue (normal)",
+      "type": "n8n-nodes-base.zendesk",
+      "typeVersion": 1,
+      "position": [980, 320],
+      "notesInFlow": true,
+      "notes": "Normal urgency -> create ticket in the topic queue with an 8h SLA."
+    },
+    {
+      "parameters": {
+        "resource": "ticket",
+        "operation": "create",
+        "additionalFields": {
+          "group": "={{ $json[\"queue\"] }}",
+          "priority": "low"
+        }
+      },
+      "id": "c4a1f004-0006-4004-8004-000000000006",
+      "name": "Backlog (low)",
+      "type": "n8n-nodes-base.zendesk",
+      "typeVersion": 1,
+      "position": [980, 480],
+      "notesInFlow": true,
+      "notes": "Low urgency -> create ticket in the topic queue with a 24h SLA."
+    }
+  ],
+  "connections": {
+    "Ticket Webhook": {
+      "main": [[{ "node": "Classify Ticket", "type": "main", "index": 0 }]]
+    },
+    "Classify Ticket": {
+      "main": [[{ "node": "Switch on Priority", "type": "main", "index": 0 }]]
+    },
+    "Switch on Priority": {
+      "main": [
+        [{ "node": "Page On-Call (high)", "type": "main", "index": 0 }],
+        [{ "node": "Route to Queue (normal)", "type": "main", "index": 0 }],
+        [{ "node": "Backlog (low)", "type": "main", "index": 0 }]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "tags": ["business-automation-playbook", "support-ticket-routing"]
+}

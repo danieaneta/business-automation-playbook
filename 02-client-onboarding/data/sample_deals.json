@@ -1,0 +1,42 @@
+[
+  {
+    "deal_id": "DEAL-1001",
+    "company": "Northwind Trading",
+    "contact_email": "owner@northwind-trading.com",
+    "plan": "smb",
+    "seats": 3,
+    "signed_at": "2026-06-20T15:00:00Z"
+  },
+  {
+    "deal_id": "DEAL-1002",
+    "company": "Brightlabs",
+    "contact_email": "ops@brightlabs.io",
+    "plan": "pro",
+    "seats": 25,
+    "signed_at": "2026-06-21T09:30:00Z"
+  },
+  {
+    "deal_id": "DEAL-1003",
+    "company": "Global Systems",
+    "contact_email": "it@globalsystems.com",
+    "plan": "enterprise",
+    "seats": 400,
+    "signed_at": "2026-06-21T18:45:00Z"
+  },
+  {
+    "deal_id": "",
+    "company": "Missing Id Co",
+    "contact_email": "noid@example.com",
+    "plan": "pro",
+    "seats": 5,
+    "signed_at": "2026-06-22T08:00:00Z"
+  },
+  {
+    "deal_id": "DEAL-1001",
+    "company": "Northwind Trading",
+    "contact_email": "owner@northwind-trading.com",
+    "plan": "smb",
+    "seats": 3,
+    "signed_at": "2026-06-20T15:00:00Z"
+  }
+]

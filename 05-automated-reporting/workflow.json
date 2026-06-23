@@ -1,0 +1,151 @@
+{
+  "name": "05 - Automated Reporting",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "cronExpression",
+              "expression": "0 8 * * 1"
+            }
+          ]
+        }
+      },
+      "id": "c5a1f005-0001-4005-8005-000000000001",
+      "name": "Weekly Schedule",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1,
+      "position": [240, 400],
+      "notesInFlow": true,
+      "notes": "Every Monday 08:00. Period + prior period are derived deterministically, not from now() in tested logic."
+    },
+    {
+      "parameters": {
+        "resource": "contact",
+        "operation": "getAll",
+        "returnAll": true,
+        "filters": {}
+      },
+      "id": "c5a1f005-0002-4005-8005-000000000002",
+      "name": "Fetch CRM KPIs",
+      "type": "n8n-nodes-base.hubspot",
+      "typeVersion": 1,
+      "position": [480, 220],
+      "notesInFlow": true,
+      "notes": "Mirrors src/connectors.py source 'crm'. Swappable for Salesforce/Pipedrive."
+    },
+    {
+      "parameters": {
+        "url": "https://api.stripe.com/v1/reporting/report_runs",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "stripeApi",
+        "options": {}
+      },
+      "id": "c5a1f005-0003-4005-8005-000000000003",
+      "name": "Fetch Billing KPIs",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [480, 400],
+      "notesInFlow": true,
+      "notes": "Mirrors src/connectors.py source 'billing'. Swappable for Chargebee/Recurly."
+    },
+    {
+      "parameters": {
+        "url": "https://analyticsdata.googleapis.com/v1beta/properties/GA4_PROPERTY_ID:runReport",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "googleAnalyticsOAuth2",
+        "options": {}
+      },
+      "id": "c5a1f005-0004-4005-8005-000000000004",
+      "name": "Fetch Analytics KPIs",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [480, 580],
+      "notesInFlow": true,
+      "notes": "Mirrors src/connectors.py source 'analytics'. Swappable for Plausible/Mixpanel."
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combinationMode": "mergeByPosition",
+        "options": {}
+      },
+      "id": "c5a1f005-0005-4005-8005-000000000005",
+      "name": "Merge Sources",
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 2,
+      "position": [760, 400]
+    },
+    {
+      "parameters": {
+        "language": "python",
+        "pythonCode": "# Mirrors src/transform.py + src/digest.py.\n# Compare current vs prior period, flag big movers (|pct| >= 10%), render an ASCII digest.\ncurrent = items[0]['json'].get('current', {})\nprevious = items[0]['json'].get('previous', {})\nnames = {\n    'new_leads': 'New Leads', 'qualified_leads': 'Qualified Leads',\n    'mrr': 'MRR ($)', 'new_customers': 'New Customers', 'churned_customers': 'Churned Customers',\n    'website_visits': 'Website Visits', 'signups': 'Signups'\n}\nlines = ['# Weekly Metrics Digest']\nhighlights = []\nfor key, name in names.items():\n    if key not in current:\n        continue\n    cur = current[key]; prev = previous.get(key, 0)\n    delta = cur - prev\n    pct = None if prev == 0 else (delta / abs(prev) * 100)\n    direction = 'up' if delta > 0 else ('down' if delta < 0 else 'flat')\n    big = pct is not None and abs(pct) >= 10\n    if big: highlights.append(name)\n    pct_s = 'new' if pct is None else ('%+.1f%%' % pct)\n    mark = '* ' if big else '  '\n    lines.append('%s%s: %s (%+d, %s %s vs prior)' % (mark, name, cur, delta, pct_s, direction))\ndigest = '\\n'.join(lines)\nreturn [{'json': {'period': items[0]['json'].get('period'), 'digest': digest, 'highlights': highlights}}]"
+      },
+      "id": "c5a1f005-0006-4005-8005-000000000006",
+      "name": "Compare + Render Digest",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1000, 400]
+    },
+    {
+      "parameters": {
+        "select": "channel",
+        "channelId": "weekly-metrics",
+        "text": "={{ $json[\"digest\"] }}"
+      },
+      "id": "c5a1f005-0007-4005-8005-000000000007",
+      "name": "Deliver to Slack",
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2,
+      "position": [1240, 300],
+      "notesInFlow": true,
+      "notes": "Idempotent in production: key delivery by period so a cron retry never re-posts the same digest."
+    },
+    {
+      "parameters": {
+        "fromEmail": "reports@example.com",
+        "toEmail": "leadership@example.com",
+        "subject": "=Weekly Metrics Digest - {{ $json[\"period\"] }}",
+        "text": "={{ $json[\"digest\"] }}",
+        "options": {}
+      },
+      "id": "c5a1f005-0008-4005-8005-000000000008",
+      "name": "Deliver by Email",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2,
+      "position": [1240, 500]
+    }
+  ],
+  "connections": {
+    "Weekly Schedule": {
+      "main": [[
+        { "node": "Fetch CRM KPIs", "type": "main", "index": 0 },
+        { "node": "Fetch Billing KPIs", "type": "main", "index": 0 },
+        { "node": "Fetch Analytics KPIs", "type": "main", "index": 0 }
+      ]]
+    },
+    "Fetch CRM KPIs": {
+      "main": [[{ "node": "Merge Sources", "type": "main", "index": 0 }]]
+    },
+    "Fetch Billing KPIs": {
+      "main": [[{ "node": "Merge Sources", "type": "main", "index": 1 }]]
+    },
+    "Fetch Analytics KPIs": {
+      "main": [[{ "node": "Merge Sources", "type": "main", "index": 2 }]]
+    },
+    "Merge Sources": {
+      "main": [[{ "node": "Compare + Render Digest", "type": "main", "index": 0 }]]
+    },
+    "Compare + Render Digest": {
+      "main": [[
+        { "node": "Deliver to Slack", "type": "main", "index": 0 },
+        { "node": "Deliver by Email", "type": "main", "index": 0 }
+      ]]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "tags": ["business-automation-playbook", "automated-reporting"]
+}

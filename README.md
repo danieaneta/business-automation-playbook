@@ -32,7 +32,8 @@ lifecycle: **acquire → onboard → bill → support → report.**
 | [04](04-support-ticket-routing/) | **Support ticket routing** | Reading + triaging + assigning every inbound message | ~8 hrs/week |
 | [05](05-automated-reporting/) | **Automated reporting** | Pulling KPIs into a weekly deck by hand | ~4 hrs/week |
 
-> Blueprint **01 is complete and runnable today.** 02–05 follow the identical folder template.
+> **All five blueprints are built, runnable, and tested — 108 passing tests in total**
+> (01: 16 · 02: 15 · 03: 29 · 04: 24 · 05: 24). Each runs on bundled dummy data with no API keys.
 
 ---
 

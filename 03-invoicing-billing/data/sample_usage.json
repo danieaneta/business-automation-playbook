@@ -1,0 +1,51 @@
+[
+  {
+    "client_id": "acme",
+    "description": "Platform subscription (April)",
+    "qty": 1,
+    "unit_price": 1200.00,
+    "date": "2026-04-01"
+  },
+  {
+    "client_id": "acme",
+    "description": "API calls (per 1k)",
+    "qty": 320,
+    "unit_price": 0.50,
+    "date": "2026-04-28"
+  },
+  {
+    "client_id": "acme",
+    "description": "Premium support hours",
+    "qty": 4,
+    "unit_price": 150.00,
+    "date": "2026-04-22"
+  },
+  {
+    "client_id": "globex",
+    "description": "Platform subscription (April)",
+    "qty": 1,
+    "unit_price": 800.00,
+    "date": "2026-04-01"
+  },
+  {
+    "client_id": "globex",
+    "description": "Seats over plan limit",
+    "qty": 6,
+    "unit_price": 25.00,
+    "date": "2026-04-15"
+  },
+  {
+    "client_id": "initech",
+    "description": "Platform subscription (April)",
+    "qty": 1,
+    "unit_price": 500.00,
+    "date": "2026-04-01"
+  },
+  {
+    "client_id": "initech",
+    "description": "Data export jobs",
+    "qty": 12,
+    "unit_price": 7.50,
+    "date": "2026-04-19"
+  }
+]

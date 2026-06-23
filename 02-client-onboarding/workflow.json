@@ -1,0 +1,133 @@
+{
+  "name": "02 - Client Onboarding",
+  "nodes": [
+    {
+      "parameters": {
+        "events": ["dealStageChanged"],
+        "filters": {
+          "stage": "closedwon"
+        },
+        "options": {}
+      },
+      "id": "c2b2f002-0001-4002-8002-000000000001",
+      "name": "Deal Won Trigger",
+      "type": "n8n-nodes-base.hubspotTrigger",
+      "typeVersion": 1,
+      "position": [240, 300],
+      "webhookId": "deal-won"
+    },
+    {
+      "parameters": {
+        "language": "python",
+        "pythonCode": "# Mirrors src/config.py + src/engine.py.\n# Computes the REQUIRED onboarding checklist for the won deal's plan.\ndeal = items[0]['json']\nplan = (deal.get('plan') or 'smb').lower()\nbase = ['provision_account','create_workspace','add_to_billing','send_welcome_email','schedule_kickoff']\nextra = {'smb': [], 'pro': [], 'enterprise': ['assign_csm']}\nsteps = base + [s for s in extra.get(plan, []) if s not in base]\nreturn [{'json': {**deal, 'required_steps': steps, 'is_enterprise': plan == 'enterprise'}}]"
+      },
+      "id": "c2b2f002-0002-4002-8002-000000000002",
+      "name": "Build Checklist",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [480, 300]
+    },
+    {
+      "parameters": {
+        "batchSize": 1,
+        "options": {}
+      },
+      "id": "c2b2f002-0003-4002-8002-000000000003",
+      "name": "Each Step",
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 1,
+      "position": [720, 300],
+      "notesInFlow": true,
+      "notes": "Iterate the required_steps; each provisioning call is idempotent (keyed deal_id:step)."
+    },
+    {
+      "parameters": {
+        "url": "={{ $env.WORKSPACE_API_URL }}/provision",
+        "method": "POST",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            { "name": "deal_id", "value": "={{ $json[\"deal_id\"] }}" },
+            { "name": "step", "value": "={{ $json[\"step\"] }}" }
+          ]
+        },
+        "options": {}
+      },
+      "id": "c2b2f002-0004-4002-8002-000000000004",
+      "name": "Provision Step (idempotent)",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [960, 300],
+      "notesInFlow": true,
+      "notes": "Idempotent upsert keyed by deal_id:step - re-runs never re-provision."
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "boolean": [
+            {
+              "value1": "={{ $json[\"is_enterprise\"] }}",
+              "value2": true
+            }
+          ]
+        }
+      },
+      "id": "c2b2f002-0005-4002-8002-000000000005",
+      "name": "Is Enterprise?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [1200, 300]
+    },
+    {
+      "parameters": {
+        "select": "channel",
+        "channelId": "onboarding-enterprise",
+        "text": "=:star: Enterprise deal {{ $json[\"deal_id\"] }} ({{ $json[\"company\"] }}) won - assign a CSM and kick off onboarding."
+      },
+      "id": "c2b2f002-0006-4002-8002-000000000006",
+      "name": "Assign CSM (enterprise)",
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2,
+      "position": [1440, 200]
+    },
+    {
+      "parameters": {
+        "fromEmail": "success@example.com",
+        "toEmail": "={{ $json[\"contact_email\"] }}",
+        "subject": "Welcome to onboarding",
+        "text": "=Welcome aboard, {{ $json[\"company\"] }}! Your account is being provisioned and your kickoff is being scheduled."
+      },
+      "id": "c2b2f002-0007-4002-8002-000000000007",
+      "name": "Send Welcome Email",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2,
+      "position": [1440, 420],
+      "notesInFlow": true,
+      "notes": "SMB / Pro -> straight to welcome + kickoff (no CSM)."
+    }
+  ],
+  "connections": {
+    "Deal Won Trigger": {
+      "main": [[{ "node": "Build Checklist", "type": "main", "index": 0 }]]
+    },
+    "Build Checklist": {
+      "main": [[{ "node": "Each Step", "type": "main", "index": 0 }]]
+    },
+    "Each Step": {
+      "main": [[{ "node": "Provision Step (idempotent)", "type": "main", "index": 0 }]]
+    },
+    "Provision Step (idempotent)": {
+      "main": [[{ "node": "Is Enterprise?", "type": "main", "index": 0 }]]
+    },
+    "Is Enterprise?": {
+      "main": [
+        [{ "node": "Assign CSM (enterprise)", "type": "main", "index": 0 }],
+        [{ "node": "Send Welcome Email", "type": "main", "index": 0 }]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "tags": ["business-automation-playbook", "client-onboarding"]
+}

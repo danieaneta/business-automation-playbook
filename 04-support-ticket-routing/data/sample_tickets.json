@@ -1,0 +1,50 @@
+[
+  {
+    "id": "T-1001",
+    "sender": "ops@acme-industries.com",
+    "subject": "URGENT: production is down",
+    "body": "Our whole dashboard is showing a 500 error and the API is down. This is an outage and it is unacceptable, we need this fixed asap.",
+    "received_at": "2026-06-23T10:30:00+00:00"
+  },
+  {
+    "id": "T-1002",
+    "sender": "finance@brightlabs.io",
+    "subject": "Question about my invoice",
+    "body": "I think I was double charged on my last subscription payment. Can someone check the billing on my account and issue a refund if needed?",
+    "received_at": "2026-06-23T11:45:00+00:00"
+  },
+  {
+    "id": "T-1003",
+    "sender": "casual@gmail.com",
+    "subject": "Small feature idea, no rush",
+    "body": "Whenever you get a chance, it would be nice to have a dark mode. Low priority, no hurry at all.",
+    "received_at": "2026-06-20T09:00:00+00:00"
+  },
+  {
+    "id": "T-1004",
+    "sender": "user@globalsystems.com",
+    "subject": "Can't log in - password reset not working",
+    "body": "I tried to reset my password but my account seems locked and I have no access. Please help me regain login access.",
+    "received_at": "2026-06-23T11:00:00+00:00"
+  },
+  {
+    "id": "T-1005",
+    "sender": "buyer@newco.com",
+    "subject": "Interested in a demo",
+    "body": "We are evaluating tools and would like a demo and a quote to upgrade to a bigger plan. Thanks!",
+    "received_at": "2026-06-23T11:50:00+00:00"
+  },
+  {
+    "id": "T-1001",
+    "sender": "ops@acme-industries.com",
+    "subject": "URGENT: production is down (update)",
+    "body": "Still an outage. The API is down and customers are angry. We need this fixed immediately.",
+    "received_at": "2026-06-23T10:30:00+00:00"
+  },
+  {
+    "id": "",
+    "sender": "noid@example.com",
+    "subject": "Ticket with no id and no timestamp",
+    "body": "This row is malformed and the pipeline must skip it safely."
+  }
+]

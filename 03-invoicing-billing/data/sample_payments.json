@@ -1,0 +1,14 @@
+[
+  {
+    "client_id": "globex",
+    "invoice_id": "INV-globex-2026-04",
+    "amount": 1026.00,
+    "paid_at": "2026-05-20"
+  },
+  {
+    "client_id": "initech",
+    "invoice_id": "INV-initech-2026-04",
+    "amount": 300.00,
+    "paid_at": "2026-05-28"
+  }
+]
