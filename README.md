@@ -1,6 +1,5 @@
 # Business Automation Playbook
 
-[![CI](https://github.com/danieaneta/business-automation-playbook/actions/workflows/ci.yml/badge.svg)](https://github.com/danieaneta/business-automation-playbook/actions/workflows/ci.yml)
 ![Made with n8n](https://img.shields.io/badge/built%20with-n8n-EA4B71)
 ![Python](https://img.shields.io/badge/python-3.10%2B-blue)
 
@@ -8,6 +7,12 @@
 > Each one ships with the **n8n workflow**, the **Python integration code** (retry, structured
 > logging, idempotency), **tests**, and a **measured before/after** — so you can see exactly
 > what gets automated and exactly how it's built.
+
+### ▶ Try the live demo
+
+**[Open `index.html`](index.html) in your browser** — no install, no server. Type in a lead and
+watch the automation score and route it in real time (the same logic as the Python pipeline).
+Just download the repo and double-click the file.
 
 Most "automation" portfolios show a screenshot of a Zapier canvas. This one ships inspectable,
 testable, self-hostable systems. Clone it, run it on the included dummy data, and read the code.

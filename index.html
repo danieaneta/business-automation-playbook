@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Business Automation Playbook — Live Demo</title>
+<style>
+  :root {
+    --bg: #0d1117; --panel: #161b22; --line: #30363d; --text: #e6edf3;
+    --muted: #8b949e; --accent: #ea4b71; --blue: #4493f8;
+    --hot: #f85149; --warm: #d29922; --cold: #58a6ff; --ok: #3fb950;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--bg); color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    line-height: 1.55;
+  }
+  .wrap { max-width: 960px; margin: 0 auto; padding: 0 20px; }
+  header { text-align: center; padding: 64px 20px 40px; border-bottom: 1px solid var(--line); }
+  header .badge {
+    display: inline-block; font-size: 12px; letter-spacing: .08em; text-transform: uppercase;
+    color: var(--accent); border: 1px solid var(--accent); border-radius: 999px; padding: 4px 12px; margin-bottom: 20px;
+  }
+  h1 { font-size: 38px; margin: 0 0 12px; letter-spacing: -.02em; }
+  header p { font-size: 18px; color: var(--muted); max-width: 620px; margin: 0 auto; }
+  .cta { margin-top: 24px; }
+  .cta a {
+    color: var(--text); background: var(--accent); text-decoration: none; font-weight: 600;
+    padding: 10px 20px; border-radius: 8px; display: inline-block;
+  }
+  section { padding: 48px 0; border-bottom: 1px solid var(--line); }
+  h2 { font-size: 24px; margin: 0 0 6px; }
+  .sub { color: var(--muted); margin: 0 0 28px; }
+  .demo { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+  @media (max-width: 760px) { .demo { grid-template-columns: 1fr; } h1 { font-size: 30px; } }
+  .card { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 22px; }
+  label { display: block; font-size: 13px; color: var(--muted); margin: 14px 0 6px; }
+  input, textarea {
+    width: 100%; background: var(--bg); border: 1px solid var(--line); border-radius: 8px;
+    color: var(--text); padding: 10px 12px; font-size: 14px; font-family: inherit;
+  }
+  input:focus, textarea:focus { outline: none; border-color: var(--blue); }
+  textarea { resize: vertical; min-height: 72px; }
+  .examples { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 16px; }
+  .examples button, .score-btn {
+    cursor: pointer; font-family: inherit; border-radius: 8px; border: 1px solid var(--line);
+    background: var(--bg); color: var(--text); padding: 8px 12px; font-size: 13px;
+  }
+  .examples button:hover { border-color: var(--blue); }
+  .score-btn {
+    width: 100%; margin-top: 18px; padding: 12px; font-size: 15px; font-weight: 600;
+    background: var(--blue); border-color: var(--blue); color: #fff;
+  }
+  .score-btn:hover { filter: brightness(1.08); }
+  .result-empty { color: var(--muted); text-align: center; padding: 40px 10px; }
+  .gauge { display: flex; align-items: baseline; gap: 12px; margin-bottom: 8px; }
+  .gauge .num { font-size: 52px; font-weight: 700; line-height: 1; }
+  .tier-pill { font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; padding: 4px 12px; border-radius: 999px; }
+  .tier-hot { background: rgba(248,81,73,.15); color: var(--hot); border: 1px solid var(--hot); }
+  .tier-warm { background: rgba(210,153,34,.15); color: var(--warm); border: 1px solid var(--warm); }
+  .tier-cold { background: rgba(88,166,255,.15); color: var(--cold); border: 1px solid var(--cold); }
+  .bar { height: 8px; background: var(--bg); border-radius: 999px; overflow: hidden; margin: 14px 0 18px; }
+  .bar > div { height: 100%; transition: width .4s ease; }
+  .action { font-size: 14px; padding: 10px 12px; border-radius: 8px; background: var(--bg); border: 1px solid var(--line); margin-bottom: 16px; }
+  .action b { color: var(--ok); }
+  .reasons { list-style: none; padding: 0; margin: 0; }
+  .reasons li { font-size: 13px; color: var(--muted); padding: 5px 0; border-top: 1px solid var(--line); }
+  .reasons li:first-child { border-top: none; }
+  .err { color: var(--hot); font-size: 13px; margin-top: 10px; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 16px; }
+  .bp { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 18px; }
+  .bp h3 { margin: 0 0 6px; font-size: 16px; }
+  .bp p { margin: 0; color: var(--muted); font-size: 14px; }
+  .bp .tag { font-size: 11px; text-transform: uppercase; letter-spacing: .06em; padding: 3px 8px; border-radius: 999px; }
+  .tag-live { background: rgba(63,185,80,.15); color: var(--ok); border: 1px solid var(--ok); }
+  .tag-soon { background: rgba(139,148,158,.12); color: var(--muted); border: 1px solid var(--line); }
+  .bp .top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+  footer { text-align: center; padding: 48px 20px; color: var(--muted); }
+  footer a { color: var(--blue); }
+  code { background: var(--panel); border: 1px solid var(--line); border-radius: 6px; padding: 2px 6px; font-size: 13px; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="badge">Business Automation Playbook</div>
+  <h1>Automations that remove your team's busywork</h1>
+  <p>Lead handling, onboarding, billing, support, and reporting — built as inspectable,
+     testable systems. Below is a <b>live demo</b> of the lead-scoring engine. Try it.</p>
+  <div class="cta"><a href="mailto:danieaneta@gmail.com">Work with me →</a></div>
+</header>
+
+<section>
+  <div class="wrap">
+    <h2>Live demo · Lead → CRM scoring</h2>
+    <p class="sub">The same logic that runs in the Python pipeline, running right here in your browser.
+       Enter a lead and see how the automation enriches, scores, and routes it.</p>
+
+    <div class="demo">
+      <div class="card">
+        <label for="email">Email</label>
+        <input id="email" type="text" placeholder="buyer@company.com" value="priya@globalsystems.com" />
+        <label for="company">Company (optional)</label>
+        <input id="company" type="text" placeholder="Acme Inc." value="Global Systems" />
+        <label for="message">Message</label>
+        <textarea id="message" placeholder="What did the lead say?">We need a demo and pricing urgently, budget approved for this quarter.</textarea>
+
+        <div class="examples">
+          <button data-ex="hot">Load: hot lead</button>
+          <button data-ex="warm">Load: warm lead</button>
+          <button data-ex="cold">Load: cold lead</button>
+        </div>
+
+        <button class="score-btn" id="scoreBtn">Score this lead →</button>
+        <div class="err" id="err"></div>
+      </div>
+
+      <div class="card" id="result">
+        <div class="result-empty">Results will appear here.<br />Enter a lead and click <b>Score this lead</b>.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <h2>The blueprints</h2>
+    <p class="sub">Each one removes a recurring manual process. Together they cover the full
+       lifecycle: acquire → onboard → bill → support → report.</p>
+    <div class="grid" id="bpGrid"></div>
+  </div>
+</section>
+
+<footer>
+  <p>Built by Danielle · <a href="mailto:danieaneta@gmail.com">danieaneta@gmail.com</a></p>
+  <p style="font-size:13px">Open source on <a href="https://github.com/danieaneta/business-automation-playbook">GitHub</a>.
+     Runs on synthetic sample data — no real customer data.</p>
+</footer>
+
+<script>
+// --- ICP scoring engine, ported 1:1 from src/config.py + src/enrichment.py + src/scoring.py ---
+const ICP = {
+  intentKeywords: ["pricing", "demo", "quote", "buy", "urgent", "budget", "trial"],
+  sizePoints: { smb: 15, mid: 30, enterprise: 40 },
+  freeDomains: ["gmail.com", "yahoo.com", "hotmail.com", "outlook.com", "icloud.com"],
+  pointsBusiness: 25, pointsPerIntent: 10, pointsNamedCompany: 10, pointsHasMessage: 5,
+  hotThreshold: 60, warmThreshold: 35,
+};
+const SIZE_HINTS = {
+  enterprise: ["corp", "global", "group", "industries", "systems"],
+  mid: ["labs", "tech", "software", "digital", "media"],
+};
+
+function enrich(email, company) {
+  const domain = email.includes("@") ? email.split("@")[1].toLowerCase() : "";
+  const isFree = ICP.freeDomains.includes(domain);
+  const isBusiness = !!domain && !isFree;
+  let size = "smb";
+  if (isBusiness) {
+    let matched = false;
+    for (const [cand, hints] of Object.entries(SIZE_HINTS)) {
+      if (hints.some(h => domain.includes(h))) { size = cand; matched = true; break; }
+    }
+    if (!matched) size = domain.endsWith(".io") ? "mid" : "smb";
+  }
+  let companyGuess = company;
+  if (!companyGuess && isBusiness) {
+    companyGuess = domain.split(".")[0].replace(/-/g, " ").replace(/\b\w/g, c => c.toUpperCase());
+  }
+  return { domain, isBusiness, size, companyGuess };
+}
+
+function score(email, company, message) {
+  const e = enrich(email, company);
+  let pts = 0; const reasons = [];
+  if (e.isBusiness) { pts += ICP.pointsBusiness; reasons.push(`Business email (+${ICP.pointsBusiness})`); }
+  const sizePts = ICP.sizePoints[e.size] || 0;
+  if (sizePts) { pts += sizePts; reasons.push(`Company size "${e.size}" (+${sizePts})`); }
+  const msg = (message || "").toLowerCase();
+  const hits = ICP.intentKeywords.filter(k => msg.includes(k));
+  if (hits.length) { const p = hits.length * ICP.pointsPerIntent; pts += p; reasons.push(`Intent keywords [${hits.join(", ")}] (+${p})`); }
+  if (company) { pts += ICP.pointsNamedCompany; reasons.push(`Named company (+${ICP.pointsNamedCompany})`); }
+  if (message) { pts += ICP.pointsHasMessage; reasons.push(`Left a message (+${ICP.pointsHasMessage})`); }
+  pts = Math.min(pts, 100);
+  const tier = pts >= ICP.hotThreshold ? "hot" : pts >= ICP.warmThreshold ? "warm" : "cold";
+  const action = { hot: "Notify sales immediately", warm: "Send nurture sequence", cold: "Add to newsletter" }[tier];
+  return { score: pts, tier, action, reasons, enrichment: e };
+}
+
+// --- UI wiring ---
+const EXAMPLES = {
+  hot:  { email: "priya@globalsystems.com", company: "Global Systems", message: "We need a demo and pricing urgently, budget approved for this quarter." },
+  warm: { email: "owner@smithplumbing.com", company: "", message: "Can you send pricing?" },
+  cold: { email: "sara.jones@gmail.com", company: "", message: "Just looking around for now." },
+};
+const TIER_COLOR = { hot: "var(--hot)", warm: "var(--warm)", cold: "var(--cold)" };
+
+function render(r) {
+  const pct = Math.max(4, r.score);
+  document.getElementById("result").innerHTML = `
+    <div class="gauge">
+      <span class="num" style="color:${TIER_COLOR[r.tier]}">${r.score}</span>
+      <span class="tier-pill tier-${r.tier}">${r.tier}</span>
+    </div>
+    <div class="bar"><div style="width:${pct}%; background:${TIER_COLOR[r.tier]}"></div></div>
+    <div class="action">Next action: <b>${r.action}</b></div>
+    <div style="font-size:13px; color:var(--muted); margin-bottom:6px">Enrichment: ${r.enrichment.isBusiness ? "business email" : "personal email"}
+      · size <b>${r.enrichment.size}</b>${r.enrichment.companyGuess ? " · " + r.enrichment.companyGuess : ""}</div>
+    <ul class="reasons">${r.reasons.map(x => `<li>${x}</li>`).join("") || "<li>No positive signals</li>"}</ul>`;
+}
+
+document.getElementById("scoreBtn").addEventListener("click", () => {
+  const email = document.getElementById("email").value.trim().toLowerCase();
+  const company = document.getElementById("company").value.trim();
+  const message = document.getElementById("message").value.trim();
+  const err = document.getElementById("err");
+  if (!email.includes("@") || !email.split("@")[1]?.includes(".")) {
+    err.textContent = "Please enter a valid email — the pipeline skips leads without one.";
+    return;
+  }
+  err.textContent = "";
+  render(score(email, company, message));
+});
+
+document.querySelectorAll(".examples button").forEach(btn => {
+  btn.addEventListener("click", () => {
+    const ex = EXAMPLES[btn.dataset.ex];
+    document.getElementById("email").value = ex.email;
+    document.getElementById("company").value = ex.company;
+    document.getElementById("message").value = ex.message;
+    document.getElementById("err").textContent = "";
+    document.getElementById("scoreBtn").click();
+  });
+});
+
+// Blueprint cards
+const BLUEPRINTS = [
+  { n: "01", title: "Lead capture → CRM", desc: "Enrich, score, route, and follow up on every inbound lead.", live: true },
+  { n: "02", title: "Client onboarding", desc: "Provision accounts and run the welcome sequence the moment a deal closes.", live: false },
+  { n: "03", title: "Invoicing & billing", desc: "Generate invoices, chase late payments, and reconcile automatically.", live: false },
+  { n: "04", title: "Support ticket routing", desc: "Classify, route, and SLA-track every inbound support message.", live: false },
+  { n: "05", title: "Automated reporting", desc: "Pull KPIs and deliver a weekly digest to Slack or email on a schedule.", live: false },
+];
+document.getElementById("bpGrid").innerHTML = BLUEPRINTS.map(b => `
+  <div class="bp">
+    <div class="top">
+      <span style="color:var(--muted); font-size:13px">${b.n}</span>
+      <span class="tag ${b.live ? "tag-live" : "tag-soon"}">${b.live ? "Live demo" : "Planned"}</span>
+    </div>
+    <h3>${b.title}</h3>
+    <p>${b.desc}</p>
+  </div>`).join("");
+
+// Score the prefilled hot lead on load
+document.getElementById("scoreBtn").click();
+</script>
+</body>
+</html>
