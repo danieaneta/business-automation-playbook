@@ -1,0 +1,7 @@
+{
+  "name": "business-automation-playbook",
+  "version": "1.0.0",
+  "description": "Serverless API (Netlify Functions) for the Business Automation Playbook. Zero dependencies.",
+  "private": true,
+  "license": "MIT"
+}

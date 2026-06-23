@@ -1,0 +1,12 @@
+# Netlify deploy config for the Business Automation Playbook.
+# Publishes the static demo site (index.html) and the serverless API (netlify/functions).
+
+[build]
+  publish = "."
+  functions = "netlify/functions"
+
+# Clean API routes: /api/lead-score -> /.netlify/functions/lead-score
+[[redirects]]
+  from = "/api/*"
+  to = "/.netlify/functions/:splat"
+  status = 200
