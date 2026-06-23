@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Business Automation Playbook — Live Demo</title>
+<title>Business Automation Playbook — Live Demos</title>
 <style>
   :root {
     --bg: #0d1117; --panel: #161b22; --line: #30363d; --text: #e6edf3;
@@ -16,14 +16,14 @@
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
     line-height: 1.55;
   }
-  .wrap { max-width: 960px; margin: 0 auto; padding: 0 20px; }
+  .wrap { max-width: 980px; margin: 0 auto; padding: 0 20px; }
   header { text-align: center; padding: 64px 20px 40px; border-bottom: 1px solid var(--line); }
   header .badge {
     display: inline-block; font-size: 12px; letter-spacing: .08em; text-transform: uppercase;
     color: var(--accent); border: 1px solid var(--accent); border-radius: 999px; padding: 4px 12px; margin-bottom: 20px;
   }
   h1 { font-size: 38px; margin: 0 0 12px; letter-spacing: -.02em; }
-  header p { font-size: 18px; color: var(--muted); max-width: 620px; margin: 0 auto; }
+  header p { font-size: 18px; color: var(--muted); max-width: 640px; margin: 0 auto; }
   .cta { margin-top: 24px; }
   .cta a {
     color: var(--text); background: var(--accent); text-decoration: none; font-weight: 600;
@@ -31,54 +31,84 @@
   }
   section { padding: 48px 0; border-bottom: 1px solid var(--line); }
   h2 { font-size: 24px; margin: 0 0 6px; }
-  .sub { color: var(--muted); margin: 0 0 28px; }
+  .sub { color: var(--muted); margin: 0 0 24px; }
+
+  .tabs { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 24px; }
+  .tab {
+    cursor: pointer; font-family: inherit; font-size: 14px; padding: 8px 14px; border-radius: 8px;
+    border: 1px solid var(--line); background: var(--bg); color: var(--muted);
+  }
+  .tab:hover { border-color: var(--blue); }
+  .tab.active { color: #fff; border-color: var(--blue); background: var(--blue); }
+  .panel { display: none; }
+  .panel.active { display: block; }
+  .panel > .lead { color: var(--muted); margin: 0 0 18px; font-size: 15px; }
+
   .demo { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
-  @media (max-width: 760px) { .demo { grid-template-columns: 1fr; } h1 { font-size: 30px; } }
+  @media (max-width: 800px) { .demo { grid-template-columns: 1fr; } h1 { font-size: 30px; } }
   .card { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 22px; }
   label { display: block; font-size: 13px; color: var(--muted); margin: 14px 0 6px; }
-  input, textarea {
+  label:first-child { margin-top: 0; }
+  input, textarea, select {
     width: 100%; background: var(--bg); border: 1px solid var(--line); border-radius: 8px;
     color: var(--text); padding: 10px 12px; font-size: 14px; font-family: inherit;
   }
-  input:focus, textarea:focus { outline: none; border-color: var(--blue); }
+  input:focus, textarea:focus, select:focus { outline: none; border-color: var(--blue); }
   textarea { resize: vertical; min-height: 72px; }
   .examples { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 16px; }
-  .examples button, .score-btn {
+  .examples button {
     cursor: pointer; font-family: inherit; border-radius: 8px; border: 1px solid var(--line);
     background: var(--bg); color: var(--text); padding: 8px 12px; font-size: 13px;
   }
   .examples button:hover { border-color: var(--blue); }
-  .score-btn {
-    width: 100%; margin-top: 18px; padding: 12px; font-size: 15px; font-weight: 600;
-    background: var(--blue); border-color: var(--blue); color: #fff;
+  .run-btn {
+    width: 100%; margin-top: 18px; padding: 12px; font-size: 15px; font-weight: 600; cursor: pointer;
+    background: var(--blue); border: 1px solid var(--blue); color: #fff; border-radius: 8px; font-family: inherit;
   }
-  .score-btn:hover { filter: brightness(1.08); }
+  .run-btn:hover { filter: brightness(1.08); }
   .result-empty { color: var(--muted); text-align: center; padding: 40px 10px; }
+  .err { color: var(--hot); font-size: 13px; margin-top: 10px; }
+  small.hint { color: var(--muted); font-size: 12px; display: block; margin-top: 8px; }
+
   .gauge { display: flex; align-items: baseline; gap: 12px; margin-bottom: 8px; }
   .gauge .num { font-size: 52px; font-weight: 700; line-height: 1; }
-  .tier-pill { font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; padding: 4px 12px; border-radius: 999px; }
-  .tier-hot { background: rgba(248,81,73,.15); color: var(--hot); border: 1px solid var(--hot); }
-  .tier-warm { background: rgba(210,153,34,.15); color: var(--warm); border: 1px solid var(--warm); }
-  .tier-cold { background: rgba(88,166,255,.15); color: var(--cold); border: 1px solid var(--cold); }
+  .pill { font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; padding: 4px 12px; border-radius: 999px; }
+  .p-hot, .p-high { background: rgba(248,81,73,.15); color: var(--hot); border: 1px solid var(--hot); }
+  .p-warm, .p-normal { background: rgba(210,153,34,.15); color: var(--warm); border: 1px solid var(--warm); }
+  .p-cold, .p-low { background: rgba(88,166,255,.15); color: var(--cold); border: 1px solid var(--cold); }
+  .p-ok { background: rgba(63,185,80,.15); color: var(--ok); border: 1px solid var(--ok); }
   .bar { height: 8px; background: var(--bg); border-radius: 999px; overflow: hidden; margin: 14px 0 18px; }
   .bar > div { height: 100%; transition: width .4s ease; }
-  .action { font-size: 14px; padding: 10px 12px; border-radius: 8px; background: var(--bg); border: 1px solid var(--line); margin-bottom: 16px; }
+  .action { font-size: 14px; padding: 10px 12px; border-radius: 8px; background: var(--bg); border: 1px solid var(--line); margin-bottom: 14px; }
   .action b { color: var(--ok); }
-  .reasons { list-style: none; padding: 0; margin: 0; }
+  .reasons, .steps, .kvs { list-style: none; padding: 0; margin: 0; }
   .reasons li { font-size: 13px; color: var(--muted); padding: 5px 0; border-top: 1px solid var(--line); }
   .reasons li:first-child { border-top: none; }
-  .err { color: var(--hot); font-size: 13px; margin-top: 10px; }
+  .kv { display: flex; justify-content: space-between; gap: 12px; font-size: 14px; padding: 7px 0; border-top: 1px solid var(--line); }
+  .kvs li:first-child .kv, .kv:first-child { border-top: none; }
+  .kv .k { color: var(--muted); }
+  .kv .v { text-align: right; font-variant-numeric: tabular-nums; }
+  .steps li { display: flex; justify-content: space-between; font-size: 13px; padding: 7px 0; border-top: 1px solid var(--line); }
+  .s-new { color: var(--ok); font-weight: 600; }
+  .s-skip { color: var(--muted); }
+  .lineitem { display: grid; grid-template-columns: 1fr 54px 76px; gap: 6px; margin-bottom: 6px; }
+  .lineitem input { padding: 7px 8px; font-size: 13px; }
+  pre.digest {
+    background: var(--bg); border: 1px solid var(--line); border-radius: 8px; padding: 14px;
+    font-size: 12.5px; overflow: auto; white-space: pre-wrap; color: var(--text);
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  }
+  .hl { color: var(--ok); }
+
   .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 16px; }
   .bp { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 18px; }
   .bp h3 { margin: 0 0 6px; font-size: 16px; }
   .bp p { margin: 0; color: var(--muted); font-size: 14px; }
   .bp .tag { font-size: 11px; text-transform: uppercase; letter-spacing: .06em; padding: 3px 8px; border-radius: 999px; }
   .tag-live { background: rgba(63,185,80,.15); color: var(--ok); border: 1px solid var(--ok); }
-  .tag-soon { background: rgba(139,148,158,.12); color: var(--muted); border: 1px solid var(--line); }
   .bp .top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
   footer { text-align: center; padding: 48px 20px; color: var(--muted); }
   footer a { color: var(--blue); }
-  code { background: var(--panel); border: 1px solid var(--line); border-radius: 6px; padding: 2px 6px; font-size: 13px; }
 </style>
 </head>
 <body>
@@ -86,38 +116,133 @@
 <header>
   <div class="badge">Business Automation Playbook</div>
   <h1>Automations that remove your team's busywork</h1>
-  <p>Lead handling, onboarding, billing, support, and reporting — built as inspectable,
-     testable systems. Below is a <b>live demo</b> of the lead-scoring engine. Try it.</p>
+  <p>Five business automations — lead handling, onboarding, billing, support, and reporting —
+     each built as an inspectable, tested system. Every one has a <b>live demo</b> below,
+     running the exact same logic as the Python code, right in your browser.</p>
   <div class="cta"><a href="mailto:danieaneta@gmail.com">Work with me →</a></div>
 </header>
 
 <section>
   <div class="wrap">
-    <h2>Live demo · Lead → CRM scoring</h2>
-    <p class="sub">The same logic that runs in the Python pipeline, running right here in your browser.
-       Enter a lead and see how the automation enriches, scores, and routes it.</p>
+    <h2>Live demos</h2>
+    <p class="sub">Pick a blueprint and try it. No install, no server — this is the real engine,
+       ported to JavaScript and verified to match the Python output exactly.</p>
 
-    <div class="demo">
-      <div class="card">
-        <label for="email">Email</label>
-        <input id="email" type="text" placeholder="buyer@company.com" value="priya@globalsystems.com" />
-        <label for="company">Company (optional)</label>
-        <input id="company" type="text" placeholder="Acme Inc." value="Global Systems" />
-        <label for="message">Message</label>
-        <textarea id="message" placeholder="What did the lead say?">We need a demo and pricing urgently, budget approved for this quarter.</textarea>
+    <div class="tabs" id="tabs">
+      <button class="tab active" data-tab="01">01 · Lead → CRM</button>
+      <button class="tab" data-tab="02">02 · Onboarding</button>
+      <button class="tab" data-tab="03">03 · Invoicing</button>
+      <button class="tab" data-tab="04">04 · Support routing</button>
+      <button class="tab" data-tab="05">05 · Reporting</button>
+    </div>
 
-        <div class="examples">
-          <button data-ex="hot">Load: hot lead</button>
-          <button data-ex="warm">Load: warm lead</button>
-          <button data-ex="cold">Load: cold lead</button>
+    <!-- 01 Lead -> CRM -->
+    <div class="panel active" id="panel-01">
+      <p class="lead">Enter a lead and watch it get enriched, scored against the Ideal Customer
+        Profile, and routed to the right follow-up.</p>
+      <div class="demo">
+        <div class="card">
+          <label for="l-email">Email</label>
+          <input id="l-email" type="text" value="priya@globalsystems.com" />
+          <label for="l-company">Company (optional)</label>
+          <input id="l-company" type="text" value="Global Systems" />
+          <label for="l-message">Message</label>
+          <textarea id="l-message">We need a demo and pricing urgently, budget approved for this quarter.</textarea>
+          <div class="examples">
+            <button data-lead="hot">Hot lead</button>
+            <button data-lead="warm">Warm lead</button>
+            <button data-lead="cold">Cold lead</button>
+          </div>
+          <button class="run-btn" id="l-run">Score this lead →</button>
+          <div class="err" id="l-err"></div>
         </div>
-
-        <button class="score-btn" id="scoreBtn">Score this lead →</button>
-        <div class="err" id="err"></div>
+        <div class="card" id="l-result"><div class="result-empty">Results appear here.</div></div>
       </div>
+    </div>
 
-      <div class="card" id="result">
-        <div class="result-empty">Results will appear here.<br />Enter a lead and click <b>Score this lead</b>.</div>
+    <!-- 02 Onboarding -->
+    <div class="panel" id="panel-02">
+      <p class="lead">A deal closes "Won" → the right checklist runs for its plan, each step
+        provisioned exactly once. Click <b>Onboard</b> twice to see idempotency: the second run
+        skips everything instead of double-provisioning.</p>
+      <div class="demo">
+        <div class="card">
+          <label for="o-company">Company</label>
+          <input id="o-company" type="text" value="Northwind Trading" />
+          <label for="o-plan">Plan</label>
+          <select id="o-plan">
+            <option value="smb">smb</option>
+            <option value="pro">pro</option>
+            <option value="enterprise">enterprise</option>
+          </select>
+          <label for="o-seats">Seats</label>
+          <input id="o-seats" type="number" value="25" />
+          <button class="run-btn" id="o-run">Onboard →</button>
+          <small class="hint">Re-running the same company is safe — provisioning is idempotent per (deal, step).</small>
+        </div>
+        <div class="card" id="o-result"><div class="result-empty">Results appear here.</div></div>
+      </div>
+    </div>
+
+    <!-- 03 Invoicing -->
+    <div class="panel" id="panel-03">
+      <p class="lead">Usage lines for a billing period → an invoice with deterministic tax/total
+        math and a due date, plus which escalating reminders fire as of a given date.</p>
+      <div class="demo">
+        <div class="card">
+          <label>Line items (description · qty · unit price)</label>
+          <div id="i-lines"></div>
+          <label for="i-period">Billing period</label>
+          <input id="i-period" type="text" value="2026-04" />
+          <label for="i-asof">As of date</label>
+          <input id="i-asof" type="date" value="2026-06-15" />
+          <button class="run-btn" id="i-run">Build invoice →</button>
+          <small class="hint">Net-30 terms, 8% tax. Change "As of" to watch reminders fire after the due date.</small>
+        </div>
+        <div class="card" id="i-result"><div class="result-empty">Results appear here.</div></div>
+      </div>
+    </div>
+
+    <!-- 04 Support routing -->
+    <div class="panel" id="panel-04">
+      <p class="lead">An inbound support message → classified (topic / urgency / sentiment),
+        routed to a queue with a priority, and stamped with an SLA deadline + breach check.</p>
+      <div class="demo">
+        <div class="card">
+          <label for="t-subject">Subject</label>
+          <input id="t-subject" type="text" value="URGENT: production is down" />
+          <label for="t-body">Message</label>
+          <textarea id="t-body">Our whole dashboard is showing a 500 error and the API is down. This is an outage and it is unacceptable, we need this fixed asap.</textarea>
+          <label for="t-received">Received at</label>
+          <input id="t-received" type="text" value="2026-06-23T10:30:00+00:00" />
+          <label for="t-asof">SLA check as of</label>
+          <input id="t-asof" type="text" value="2026-06-23T12:00:00+00:00" />
+          <div class="examples">
+            <button data-ticket="outage">Outage</button>
+            <button data-ticket="billing">Billing</button>
+            <button data-ticket="account">Account</button>
+            <button data-ticket="sales">Sales</button>
+            <button data-ticket="low">Low priority</button>
+          </div>
+          <button class="run-btn" id="t-run">Classify &amp; route →</button>
+        </div>
+        <div class="card" id="t-result"><div class="result-empty">Results appear here.</div></div>
+      </div>
+    </div>
+
+    <!-- 05 Reporting -->
+    <div class="panel" id="panel-05">
+      <p class="lead">This period's KPIs vs the prior period → deltas, % change, and big movers
+        flagged automatically — rendered into the digest that gets delivered to Slack.</p>
+      <div class="demo">
+        <div class="card">
+          <label>This period's values (prior period shown in grey)</label>
+          <div id="r-metrics"></div>
+          <label for="r-threshold">Highlight threshold (% change)</label>
+          <input id="r-threshold" type="number" value="10" />
+          <button class="run-btn" id="r-run">Build digest →</button>
+        </div>
+        <div class="card" id="r-result"><div class="result-empty">Results appear here.</div></div>
       </div>
     </div>
   </div>
@@ -126,7 +251,7 @@
 <section>
   <div class="wrap">
     <h2>The blueprints</h2>
-    <p class="sub">Each one removes a recurring manual process. Together they cover the full
+    <p class="sub">Each removes a recurring manual process. Together they cover the full
        lifecycle: acquire → onboard → bill → support → report.</p>
     <div class="grid" id="bpGrid"></div>
   </div>
@@ -135,11 +260,23 @@
 <footer>
   <p>Built by Danielle · <a href="mailto:danieaneta@gmail.com">danieaneta@gmail.com</a></p>
   <p style="font-size:13px">Open source on <a href="https://github.com/danieaneta/business-automation-playbook">GitHub</a>.
-     Runs on synthetic sample data — no real customer data.</p>
+     Every demo runs on synthetic sample data — no real customer data.</p>
 </footer>
 
 <script>
-// --- ICP scoring engine, ported 1:1 from src/config.py + src/enrichment.py + src/scoring.py ---
+/* ===== Tabs ===== */
+document.querySelectorAll(".tab").forEach(t => t.addEventListener("click", () => {
+  document.querySelectorAll(".tab").forEach(x => x.classList.remove("active"));
+  document.querySelectorAll(".panel").forEach(x => x.classList.remove("active"));
+  t.classList.add("active");
+  document.getElementById("panel-" + t.dataset.tab).classList.add("active");
+}));
+
+const $ = id => document.getElementById(id);
+const esc = s => String(s).replace(/[&<>]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;" }[c]));
+const round2 = x => Math.round((x + Number.EPSILON) * 100) / 100;
+
+/* ================= 01 · Lead -> CRM (ports src/scoring.py + enrichment.py + config.py) ===== */
 const ICP = {
   intentKeywords: ["pricing", "demo", "quote", "buy", "urgent", "budget", "trial"],
   sizePoints: { smb: 15, mid: 30, enterprise: 40 },
@@ -151,8 +288,7 @@ const SIZE_HINTS = {
   enterprise: ["corp", "global", "group", "industries", "systems"],
   mid: ["labs", "tech", "software", "digital", "media"],
 };
-
-function enrich(email, company) {
+function leadEnrich(email, company) {
   const domain = email.includes("@") ? email.split("@")[1].toLowerCase() : "";
   const isFree = ICP.freeDomains.includes(domain);
   const isBusiness = !!domain && !isFree;
@@ -165,18 +301,14 @@ function enrich(email, company) {
     if (!matched) size = domain.endsWith(".io") ? "mid" : "smb";
   }
   let companyGuess = company;
-  if (!companyGuess && isBusiness) {
-    companyGuess = domain.split(".")[0].replace(/-/g, " ").replace(/\b\w/g, c => c.toUpperCase());
-  }
+  if (!companyGuess && isBusiness) companyGuess = domain.split(".")[0].replace(/-/g, " ").replace(/\b\w/g, c => c.toUpperCase());
   return { domain, isBusiness, size, companyGuess };
 }
-
-function score(email, company, message) {
-  const e = enrich(email, company);
-  let pts = 0; const reasons = [];
+function leadScore(email, company, message) {
+  const e = leadEnrich(email, company); let pts = 0; const reasons = [];
   if (e.isBusiness) { pts += ICP.pointsBusiness; reasons.push(`Business email (+${ICP.pointsBusiness})`); }
-  const sizePts = ICP.sizePoints[e.size] || 0;
-  if (sizePts) { pts += sizePts; reasons.push(`Company size "${e.size}" (+${sizePts})`); }
+  const sp = ICP.sizePoints[e.size] || 0;
+  if (sp) { pts += sp; reasons.push(`Company size "${e.size}" (+${sp})`); }
   const msg = (message || "").toLowerCase();
   const hits = ICP.intentKeywords.filter(k => msg.includes(k));
   if (hits.length) { const p = hits.length * ICP.pointsPerIntent; pts += p; reasons.push(`Intent keywords [${hits.join(", ")}] (+${p})`); }
@@ -187,73 +319,270 @@ function score(email, company, message) {
   const action = { hot: "Notify sales immediately", warm: "Send nurture sequence", cold: "Add to newsletter" }[tier];
   return { score: pts, tier, action, reasons, enrichment: e };
 }
-
-// --- UI wiring ---
-const EXAMPLES = {
-  hot:  { email: "priya@globalsystems.com", company: "Global Systems", message: "We need a demo and pricing urgently, budget approved for this quarter." },
+const LEAD_EX = {
+  hot: { email: "priya@globalsystems.com", company: "Global Systems", message: "We need a demo and pricing urgently, budget approved for this quarter." },
   warm: { email: "owner@smithplumbing.com", company: "", message: "Can you send pricing?" },
   cold: { email: "sara.jones@gmail.com", company: "", message: "Just looking around for now." },
 };
 const TIER_COLOR = { hot: "var(--hot)", warm: "var(--warm)", cold: "var(--cold)" };
-
-function render(r) {
+function leadRender(r) {
   const pct = Math.max(4, r.score);
-  document.getElementById("result").innerHTML = `
-    <div class="gauge">
-      <span class="num" style="color:${TIER_COLOR[r.tier]}">${r.score}</span>
-      <span class="tier-pill tier-${r.tier}">${r.tier}</span>
-    </div>
+  $("l-result").innerHTML = `
+    <div class="gauge"><span class="num" style="color:${TIER_COLOR[r.tier]}">${r.score}</span>
+      <span class="pill p-${r.tier}">${r.tier}</span></div>
     <div class="bar"><div style="width:${pct}%; background:${TIER_COLOR[r.tier]}"></div></div>
-    <div class="action">Next action: <b>${r.action}</b></div>
+    <div class="action">Next action: <b>${esc(r.action)}</b></div>
     <div style="font-size:13px; color:var(--muted); margin-bottom:6px">Enrichment: ${r.enrichment.isBusiness ? "business email" : "personal email"}
-      · size <b>${r.enrichment.size}</b>${r.enrichment.companyGuess ? " · " + r.enrichment.companyGuess : ""}</div>
-    <ul class="reasons">${r.reasons.map(x => `<li>${x}</li>`).join("") || "<li>No positive signals</li>"}</ul>`;
+      · size <b>${r.enrichment.size}</b>${r.enrichment.companyGuess ? " · " + esc(r.enrichment.companyGuess) : ""}</div>
+    <ul class="reasons">${r.reasons.map(x => `<li>${esc(x)}</li>`).join("") || "<li>No positive signals</li>"}</ul>`;
 }
+$("l-run").addEventListener("click", () => {
+  const email = $("l-email").value.trim().toLowerCase();
+  if (!email.includes("@") || !email.split("@")[1]?.includes(".")) { $("l-err").textContent = "Enter a valid email — the pipeline skips leads without one."; return; }
+  $("l-err").textContent = "";
+  leadRender(leadScore(email, $("l-company").value.trim(), $("l-message").value.trim()));
+});
+document.querySelectorAll("[data-lead]").forEach(b => b.addEventListener("click", () => {
+  const ex = LEAD_EX[b.dataset.lead];
+  $("l-email").value = ex.email; $("l-company").value = ex.company; $("l-message").value = ex.message;
+  $("l-err").textContent = ""; $("l-run").click();
+}));
 
-document.getElementById("scoreBtn").addEventListener("click", () => {
-  const email = document.getElementById("email").value.trim().toLowerCase();
-  const company = document.getElementById("company").value.trim();
-  const message = document.getElementById("message").value.trim();
-  const err = document.getElementById("err");
-  if (!email.includes("@") || !email.split("@")[1]?.includes(".")) {
-    err.textContent = "Please enter a valid email — the pipeline skips leads without one.";
-    return;
+/* ================= 02 · Onboarding (ports src/config.py + engine.py) ===== */
+const BASE_STEPS = ["provision_account", "create_workspace", "add_to_billing", "send_welcome_email", "schedule_kickoff"];
+const PLAN_EXTRA = { smb: [], pro: [], enterprise: ["assign_csm"] };
+const ONB_SLA_HOURS = 48;
+function stepsFor(plan) {
+  const steps = BASE_STEPS.slice();
+  for (const extra of (PLAN_EXTRA[plan] || [])) if (!steps.includes(extra)) steps.push(extra);
+  return steps;
+}
+const provisioned02 = new Set(); // demonstrates idempotency across clicks
+function onboard(company, plan) {
+  const steps = stepsFor(plan), completed = [], skipped = [];
+  for (const step of steps) {
+    const key = `${company}:${step}`;
+    if (provisioned02.has(key)) skipped.push(step);
+    else { provisioned02.add(key); completed.push(step); }
   }
-  err.textContent = "";
-  render(score(email, company, message));
+  return { steps, completed, skipped, percent: 100, sla: ONB_SLA_HOURS };
+}
+$("o-run").addEventListener("click", () => {
+  const company = $("o-company").value.trim() || "(unnamed)";
+  const plan = $("o-plan").value;
+  const r = onboard(company, plan);
+  const statusFor = s => r.completed.includes(s)
+    ? `<span class="s-new">provisioned (new)</span>` : `<span class="s-skip">skipped (already done)</span>`;
+  const rerun = r.completed.length === 0;
+  $("o-result").innerHTML = `
+    <div class="gauge"><span class="num" style="color:var(--ok)">${r.percent}%</span>
+      <span class="pill ${rerun ? "p-normal" : "p-ok"}">${rerun ? "already onboarded" : "onboarded"}</span></div>
+    <div class="action"><b>${r.completed.length}</b> new · <b>${r.skipped.length}</b> skipped ·
+      plan <b>${esc(plan)}</b> · SLA ${r.sla}h</div>
+    <ul class="steps">${r.steps.map((s, i) => `<li><span>${i + 1}. ${esc(s)}</span>${statusFor(s)}</li>`).join("")}</ul>
+    <small class="hint">${rerun ? "Idempotent re-run: nothing was re-provisioned." : "Click Onboard again to see the idempotent re-run."}</small>`;
 });
 
-document.querySelectorAll(".examples button").forEach(btn => {
-  btn.addEventListener("click", () => {
-    const ex = EXAMPLES[btn.dataset.ex];
-    document.getElementById("email").value = ex.email;
-    document.getElementById("company").value = ex.company;
-    document.getElementById("message").value = ex.message;
-    document.getElementById("err").textContent = "";
-    document.getElementById("scoreBtn").click();
+/* ================= 03 · Invoicing (ports src/invoicing.py + reminders.py + config.py) ===== */
+const BILLING = { taxRate: 0.08, termsDays: 30, reminderOffsets: [3, 7, 14], currency: "USD" };
+const LINES_DEFAULT = [
+  { description: "Platform subscription (April)", qty: 1, unit_price: 1200.00 },
+  { description: "API calls (per 1k)", qty: 320, unit_price: 0.50 },
+  { description: "Premium support hours", qty: 4, unit_price: 150.00 },
+];
+function renderLineInputs() {
+  $("i-lines").innerHTML = LINES_DEFAULT.map((l, i) => `
+    <div class="lineitem">
+      <input id="ld-${i}" value="${esc(l.description)}" />
+      <input id="lq-${i}" type="number" value="${l.qty}" />
+      <input id="lp-${i}" type="number" step="0.01" value="${l.unit_price}" />
+    </div>`).join("");
+}
+function parseDateUTC(s) { const [y, m, d] = s.split("-").map(Number); return new Date(Date.UTC(y, m - 1, d)); }
+function periodEnd(period) { const [y, m] = period.split("-").map(Number); return new Date(Date.UTC(m === 12 ? y + 1 : y, m === 12 ? 0 : m, 0)); }
+function isoDate(dt) { return dt.toISOString().slice(0, 10); }
+function buildInvoice(lines, period, asOf) {
+  let subtotal = 0; const items = [];
+  for (const l of lines) { const amount = round2(l.qty * l.unit_price); subtotal += amount; items.push({ ...l, amount }); }
+  subtotal = round2(subtotal);
+  const tax = round2(subtotal * BILLING.taxRate);
+  const total = round2(subtotal + tax);
+  const due = new Date(periodEnd(period).getTime() + BILLING.termsDays * 86400000);
+  const daysPast = Math.max(Math.floor((asOf - due) / 86400000), 0);
+  const reminders = daysPast > 0 ? BILLING.reminderOffsets.filter(o => daysPast >= o) : [];
+  return { items, subtotal, tax, total, due, daysPast, reminders, next: reminders.length ? reminders[reminders.length - 1] : null };
+}
+const money = n => n.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+$("i-run").addEventListener("click", () => {
+  const lines = LINES_DEFAULT.map((_, i) => ({
+    description: $("ld-" + i).value, qty: parseFloat($("lq-" + i).value) || 0, unit_price: parseFloat($("lp-" + i).value) || 0,
+  }));
+  const period = $("i-period").value.trim();
+  const inv = buildInvoice(lines, period, parseDateUTC($("i-asof").value));
+  const overdue = inv.daysPast > 0;
+  $("i-result").innerHTML = `
+    <ul class="kvs">
+      ${inv.items.map(it => `<li><div class="kv"><span class="k">${esc(it.description)} (${it.qty}×${money(it.unit_price)})</span><span class="v">${money(it.amount)}</span></div></li>`).join("")}
+    </ul>
+    <div style="height:10px"></div>
+    <div class="kv"><span class="k">Subtotal</span><span class="v">${money(inv.subtotal)} ${BILLING.currency}</span></div>
+    <div class="kv"><span class="k">Tax (8%)</span><span class="v">${money(inv.tax)}</span></div>
+    <div class="kv"><span class="k"><b>Total</b></span><span class="v"><b>${money(inv.total)} ${BILLING.currency}</b></span></div>
+    <div class="kv"><span class="k">Due date (net-30)</span><span class="v">${isoDate(inv.due)}</span></div>
+    <div style="height:14px"></div>
+    <div class="action">
+      Status: <span class="pill ${overdue ? "p-high" : "p-ok"}">${overdue ? `overdue ${inv.daysPast}d` : "not yet due"}</span><br/>
+      <span style="font-size:13px; color:var(--muted)">Reminders fired: ${inv.reminders.length ? inv.reminders.map(r => r + "d").join(", ") : "none"}${inv.next ? ` &nbsp;·&nbsp; send now: <b style="color:var(--ok)">reminder@${inv.next}d</b>` : ""}</span>
+    </div>`;
+});
+
+/* ================= 04 · Support routing (ports src/classifier.py + routing.py + config.py) ===== */
+const ROUTING = {
+  topicKeywords: {
+    billing: ["invoice", "charge", "refund", "payment", "billing", "subscription", "pricing"],
+    technical: ["error", "bug", "crash", "outage", "down", "broken", "fails", "500", "login"],
+    account: ["password", "account", "access", "permission", "login", "reset", "locked"],
+    sales: ["demo", "quote", "upgrade", "plan", "buy", "purchase", "trial", "sales"],
+  },
+  highSignals: ["urgent", "asap", "outage", "down", "critical", "emergency", "immediately"],
+  lowSignals: ["whenever", "no rush", "no hurry", "low priority", "not urgent", "someday"],
+  negative: ["angry", "frustrated", "unacceptable", "terrible", "worst", "disappointed", "ridiculous", "furious"],
+  topicQueue: { billing: "billing-queue", technical: "tech-support-queue", account: "account-queue", sales: "sales-queue", general: "triage-queue" },
+  slaMinutes: { high: 60, normal: 480, low: 1440 },
+  oncallQueue: "oncall-pager",
+};
+function classify(subject, body) {
+  const text = `${subject}\n${body}`.toLowerCase();
+  let topic = "general", bestHits = [];
+  for (const [t, kws] of Object.entries(ROUTING.topicKeywords)) {
+    const hits = kws.filter(k => text.includes(k));
+    if (hits.length > bestHits.length) { topic = t; bestHits = hits; }
+  }
+  const high = ROUTING.highSignals.filter(s => text.includes(s));
+  const low = ROUTING.lowSignals.filter(s => text.includes(s));
+  const urgency = high.length ? "high" : low.length ? "low" : "normal";
+  const neg = ROUTING.negative.filter(s => text.includes(s));
+  const sentiment = neg.length ? "negative" : "neutral";
+  const reasons = [];
+  reasons.push(topic === "general" ? "no topic keywords matched -> general" : `topic '${topic}' from ${JSON.stringify(bestHits)}`);
+  reasons.push(urgency === "high" ? `high urgency from ${JSON.stringify(high)}` : urgency === "low" ? `low urgency from ${JSON.stringify(low)}` : "normal urgency (no signals)");
+  if (sentiment === "negative") reasons.push(`negative sentiment from ${JSON.stringify(neg)}`);
+  return { topic, urgency, sentiment, reasons };
+}
+function isoTs(dt) { return dt.toISOString().replace(".000Z", "+00:00"); }
+function route(subject, body, receivedAt, asOf) {
+  const c = classify(subject, body);
+  const escalate = c.urgency === "high";
+  const queue = escalate ? ROUTING.oncallQueue : (ROUTING.topicQueue[c.topic] || ROUTING.topicQueue.general);
+  const assignee = escalate ? "on-call-engineer" : `${c.topic}-team`;
+  const start = new Date(receivedAt);
+  const deadline = new Date(start.getTime() + ROUTING.slaMinutes[c.urgency] * 60000);
+  const breaching = new Date(asOf) >= deadline;
+  return { ...c, escalate, queue, assignee, priority: c.urgency, deadline, breaching, sla: ROUTING.slaMinutes[c.urgency] };
+}
+const TICKET_EX = {
+  outage: { s: "URGENT: production is down", b: "Our whole dashboard is showing a 500 error and the API is down. This is an outage and it is unacceptable, we need this fixed asap." },
+  billing: { s: "Question about my invoice", b: "I think I was double charged on my last subscription payment. Can someone check the billing on my account and issue a refund if needed?" },
+  account: { s: "Can't log in - password reset not working", b: "I tried to reset my password but my account seems locked and I have no access. Please help me regain login access." },
+  sales: { s: "Interested in a demo", b: "We are evaluating tools and would like a demo and a quote to upgrade to a bigger plan. Thanks!" },
+  low: { s: "Small feature idea, no rush", b: "Whenever you get a chance, it would be nice to have a dark mode. Low priority, no hurry at all." },
+};
+$("t-run").addEventListener("click", () => {
+  const r = route($("t-subject").value, $("t-body").value, $("t-received").value.trim(), $("t-asof").value.trim());
+  $("t-result").innerHTML = `
+    <div style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:14px">
+      <span class="pill p-${r.priority}">${r.priority} priority</span>
+      <span class="pill p-normal" style="background:var(--bg)">${esc(r.topic)}</span>
+      <span class="pill p-normal" style="background:var(--bg)">${esc(r.sentiment)}</span>
+      ${r.escalate ? `<span class="pill p-high">paged on-call</span>` : ""}
+    </div>
+    <div class="kv"><span class="k">Queue</span><span class="v">${esc(r.queue)}</span></div>
+    <div class="kv"><span class="k">Assignee</span><span class="v">${esc(r.assignee)}</span></div>
+    <div class="kv"><span class="k">SLA window</span><span class="v">${r.sla} min</span></div>
+    <div class="kv"><span class="k">SLA deadline</span><span class="v">${isoTs(r.deadline)}</span></div>
+    <div class="kv"><span class="k">Breaching?</span><span class="v">${r.breaching ? `<b style="color:var(--hot)">YES — escalate</b>` : `<span style="color:var(--ok)">no</span>`}</span></div>
+    <div style="height:12px"></div>
+    <ul class="reasons">${r.reasons.map(x => `<li>${esc(x)}</li>`).join("")}</ul>`;
+});
+document.querySelectorAll("[data-ticket]").forEach(b => b.addEventListener("click", () => {
+  const ex = TICKET_EX[b.dataset.ticket];
+  $("t-subject").value = ex.s; $("t-body").value = ex.b; $("t-run").click();
+}));
+
+/* ================= 05 · Reporting (ports src/transform.py + digest.py + config.py) ===== */
+const METRICS = [
+  { source: "crm", metric: "new_leads", display: "New Leads", prev: 120, cur: 138 },
+  { source: "crm", metric: "qualified_leads", display: "Qualified Leads", prev: 44, cur: 46 },
+  { source: "billing", metric: "mrr", display: "MRR ($)", prev: 48200, cur: 49100 },
+  { source: "billing", metric: "new_customers", display: "New Customers", prev: 9, cur: 14 },
+  { source: "billing", metric: "churned_customers", display: "Churned Customers", prev: 2, cur: 5 },
+  { source: "analytics", metric: "website_visits", display: "Website Visits", prev: 9800, cur: 10250 },
+  { source: "analytics", metric: "signups", display: "Signups", prev: 0, cur: 31 },
+];
+const PERIOD = "2026-W24", PRIOR = "2026-W23", ORG = "Acme Inc";
+function renderMetricInputs() {
+  $("r-metrics").innerHTML = METRICS.map((m, i) => `
+    <div class="lineitem" style="grid-template-columns:1fr 70px 70px; align-items:center">
+      <span style="font-size:13px; color:var(--muted)">${esc(m.display)}</span>
+      <span style="font-size:13px; color:var(--muted); text-align:right">${m.prev.toLocaleString("en-US")}</span>
+      <input id="rm-${i}" type="number" value="${m.cur}" />
+    </div>`).join("");
+}
+function pctChange(value, previous) { if (previous === 0) return value === 0 ? 0 : null; return (value - previous) / Math.abs(previous) * 100; }
+const fmtValue = v => Number.isInteger(v) ? v.toLocaleString("en-US") : v.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+function fmtPct(p) { if (p === null) return "new"; return (p > 0 ? "+" : "") + p.toFixed(1) + "%"; }
+function fmtDelta(d) { return (d > 0 ? "+" : "") + fmtValue(d); }
+function buildReport(threshold) {
+  return METRICS.map((m, i) => {
+    const value = parseFloat($("rm-" + i).value) || 0, previous = m.prev;
+    const delta = value - previous, pct = pctChange(value, previous);
+    const direction = delta > 0 ? "up" : delta < 0 ? "down" : "flat";
+    const highlighted = pct !== null && Math.abs(pct) >= threshold;
+    return { ...m, value, previous, delta, pct, direction, highlighted };
   });
+}
+function renderDigest(rows, threshold) {
+  const row = r => `${r.highlighted ? "* " : "  "}${r.display}: ${fmtValue(r.value)} (${fmtDelta(r.delta)}, ${fmtPct(r.pct)} ${r.direction} vs prior)`;
+  const highlights = rows.filter(r => r.highlighted);
+  const lines = [`# Weekly Metrics Digest - ${PERIOD}`, `_For ${ORG} (vs ${PRIOR})_`, ""];
+  if (highlights.length) { lines.push("## Highlights (big movers)"); highlights.forEach(r => lines.push(row(r))); lines.push(""); }
+  lines.push("## All metrics");
+  rows.forEach(r => lines.push(row(r)));
+  lines.push("");
+  lines.push(`${rows.length} metrics reported, ${highlights.length} flagged as big movers (threshold reached). '*' = big mover.`);
+  return lines.join("\n");
+}
+$("r-run").addEventListener("click", () => {
+  const threshold = parseFloat($("r-threshold").value) || 0;
+  const rows = buildReport(threshold);
+  const digest = renderDigest(rows, threshold)
+    .replace(/^(\* .*)$/gm, '<span class="hl">$1</span>');
+  $("r-result").innerHTML = `<pre class="digest">${digest}</pre>`;
 });
 
-// Blueprint cards
+/* ===== Blueprint cards ===== */
 const BLUEPRINTS = [
   { n: "01", title: "Lead capture → CRM", desc: "Enrich, score, route, and follow up on every inbound lead.", tag: "Live demo · 16 tests" },
-  { n: "02", title: "Client onboarding", desc: "Provision accounts and run the welcome sequence the moment a deal closes.", tag: "Built · 15 tests" },
-  { n: "03", title: "Invoicing & billing", desc: "Generate invoices, chase late payments, and reconcile automatically.", tag: "Built · 29 tests" },
-  { n: "04", title: "Support ticket routing", desc: "Classify, route, and SLA-track every inbound support message.", tag: "Built · 24 tests" },
-  { n: "05", title: "Automated reporting", desc: "Pull KPIs and deliver a weekly digest to Slack or email on a schedule.", tag: "Built · 24 tests" },
+  { n: "02", title: "Client onboarding", desc: "Provision accounts and run the welcome sequence the moment a deal closes.", tag: "Live demo · 15 tests" },
+  { n: "03", title: "Invoicing & billing", desc: "Generate invoices, chase late payments, and reconcile automatically.", tag: "Live demo · 29 tests" },
+  { n: "04", title: "Support ticket routing", desc: "Classify, route, and SLA-track every inbound support message.", tag: "Live demo · 24 tests" },
+  { n: "05", title: "Automated reporting", desc: "Pull KPIs and deliver a weekly digest to Slack or email on a schedule.", tag: "Live demo · 24 tests" },
 ];
-document.getElementById("bpGrid").innerHTML = BLUEPRINTS.map(b => `
+$("bpGrid").innerHTML = BLUEPRINTS.map(b => `
   <div class="bp">
-    <div class="top">
-      <span style="color:var(--muted); font-size:13px">${b.n}</span>
-      <span class="tag tag-live">${b.tag}</span>
-    </div>
-    <h3>${b.title}</h3>
-    <p>${b.desc}</p>
+    <div class="top"><span style="color:var(--muted); font-size:13px">${b.n}</span>
+      <span class="tag tag-live">${b.tag}</span></div>
+    <h3>${b.title}</h3><p>${b.desc}</p>
   </div>`).join("");
 
-// Score the prefilled hot lead on load
-document.getElementById("scoreBtn").click();
+/* ===== Init: render dynamic inputs + run each demo once ===== */
+renderLineInputs();
+renderMetricInputs();
+$("l-run").click();
+$("o-run").click();
+$("i-run").click();
+$("t-run").click();
+$("r-run").click();
 </script>
 </body>
 </html>
