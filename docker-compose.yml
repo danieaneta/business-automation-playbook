@@ -1,0 +1,21 @@
+# Self-host n8n in 2 minutes:  docker compose up -d  →  http://localhost:5678
+# Then import any blueprint's workflow.json from the n8n UI (Workflows → Import from File).
+services:
+  n8n:
+    image: n8nio/n8n:latest
+    container_name: bap-n8n
+    restart: unless-stopped
+    ports:
+      - "5678:5678"
+    environment:
+      - N8N_HOST=localhost
+      - N8N_PORT=5678
+      - N8N_PROTOCOL=http
+      - GENERIC_TIMEZONE=UTC
+      # For local/demo use only. Set real auth before exposing publicly.
+      - N8N_SECURE_COOKIE=false
+    volumes:
+      - n8n_data:/home/node/.n8n
+
+volumes:
+  n8n_data:

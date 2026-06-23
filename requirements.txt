@@ -1,0 +1,3 @@
+# Runtime + test dependencies for all blueprints.
+# The sample pipelines run on local dummy data, so no network libraries are required to demo.
+pytest>=8.0

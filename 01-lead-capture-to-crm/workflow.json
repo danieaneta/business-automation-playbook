@@ -1,0 +1,115 @@
+{
+  "name": "01 - Lead Capture to CRM",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "lead-capture",
+        "responseMode": "onReceived",
+        "options": {}
+      },
+      "id": "b1a1f001-0001-4001-8001-000000000001",
+      "name": "Lead Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [240, 300],
+      "webhookId": "lead-capture"
+    },
+    {
+      "parameters": {
+        "language": "python",
+        "pythonCode": "# Mirrors src/enrichment.py + src/scoring.py.\n# In production, call the Python service or replicate the ICP rules here.\nlead = items[0]['json']\nemail = (lead.get('email') or '').lower()\ndomain = email.split('@')[1] if '@' in email else ''\nfree = {'gmail.com','yahoo.com','hotmail.com','outlook.com','icloud.com'}\nis_business = bool(domain) and domain not in free\nmsg = (lead.get('message') or '').lower()\nintent = [k for k in ['pricing','demo','quote','buy','urgent','budget','trial'] if k in msg]\nscore = 0\nif is_business: score += 25\nscore += len(intent) * 10\nif lead.get('company'): score += 10\nif msg: score += 5\ntier = 'hot' if score >= 60 else ('warm' if score >= 35 else 'cold')\nreturn [{'json': {**lead, 'score': score, 'tier': tier, 'is_business': is_business}}]"
+      },
+      "id": "b1a1f001-0002-4001-8001-000000000002",
+      "name": "Enrich + Score",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [480, 300]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{ $json[\"tier\"] }}",
+              "operation": "equals",
+              "value2": "hot"
+            }
+          ]
+        }
+      },
+      "id": "b1a1f001-0003-4001-8001-000000000003",
+      "name": "Is Hot?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [720, 300]
+    },
+    {
+      "parameters": {
+        "resource": "contact",
+        "operation": "upsert",
+        "email": "={{ $json[\"email\"] }}",
+        "additionalFields": {
+          "companyName": "={{ $json[\"company\"] }}"
+        }
+      },
+      "id": "b1a1f001-0004-4001-8001-000000000004",
+      "name": "Upsert to CRM",
+      "type": "n8n-nodes-base.hubspot",
+      "typeVersion": 1,
+      "position": [960, 200],
+      "notesInFlow": true,
+      "notes": "Idempotent upsert keyed by email — re-runs never duplicate."
+    },
+    {
+      "parameters": {
+        "select": "channel",
+        "channelId": "sales-alerts",
+        "text": "=:fire: HOT lead {{ $json[\"email\"] }} (score {{ $json[\"score\"] }}) — follow up now."
+      },
+      "id": "b1a1f001-0005-4001-8001-000000000005",
+      "name": "Notify Sales (hot)",
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2,
+      "position": [1200, 200]
+    },
+    {
+      "parameters": {
+        "resource": "contact",
+        "operation": "upsert",
+        "email": "={{ $json[\"email\"] }}",
+        "additionalFields": {
+          "lifecycleStage": "lead"
+        }
+      },
+      "id": "b1a1f001-0006-4001-8001-000000000006",
+      "name": "Nurture / Newsletter",
+      "type": "n8n-nodes-base.hubspot",
+      "typeVersion": 1,
+      "position": [960, 420],
+      "notesInFlow": true,
+      "notes": "Warm -> nurture sequence, Cold -> newsletter."
+    }
+  ],
+  "connections": {
+    "Lead Webhook": {
+      "main": [[{ "node": "Enrich + Score", "type": "main", "index": 0 }]]
+    },
+    "Enrich + Score": {
+      "main": [[{ "node": "Is Hot?", "type": "main", "index": 0 }]]
+    },
+    "Is Hot?": {
+      "main": [
+        [{ "node": "Upsert to CRM", "type": "main", "index": 0 }],
+        [{ "node": "Nurture / Newsletter", "type": "main", "index": 0 }]
+      ]
+    },
+    "Upsert to CRM": {
+      "main": [[{ "node": "Notify Sales (hot)", "type": "main", "index": 0 }]]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "tags": ["business-automation-playbook", "lead-capture"]
+}

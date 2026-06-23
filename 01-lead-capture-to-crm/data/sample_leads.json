@@ -1,0 +1,44 @@
+[
+  {
+    "email": "priya@globalsystems.com",
+    "name": "Priya Nair",
+    "company": "Global Systems",
+    "message": "We need a demo and pricing urgently, budget approved for this quarter.",
+    "source": "website_form"
+  },
+  {
+    "email": "marcus@brightlabs.io",
+    "name": "Marcus Lee",
+    "company": "",
+    "message": "Interested in a trial, can you send a quote?",
+    "source": "google_ad"
+  },
+  {
+    "email": "sara.jones@gmail.com",
+    "name": "Sara Jones",
+    "company": "",
+    "message": "Just looking around for now.",
+    "source": "newsletter"
+  },
+  {
+    "email": "ops@acme-industries.com",
+    "name": "Dana Okoro",
+    "company": "Acme Industries",
+    "message": "",
+    "source": "referral"
+  },
+  {
+    "email": "not-an-email",
+    "name": "Broken Record",
+    "company": "",
+    "message": "should be skipped",
+    "source": "website_form"
+  },
+  {
+    "email": "priya@globalsystems.com",
+    "name": "Priya Nair",
+    "company": "Global Systems",
+    "message": "Following up — still want that demo and pricing.",
+    "source": "website_form"
+  }
+]

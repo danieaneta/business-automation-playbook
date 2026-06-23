@@ -1,0 +1,17 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.pytest_cache/
+*.egg-info/
+
+# Secrets / local runtime state
+.env
+**/data/*_store.json
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
