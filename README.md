@@ -8,14 +8,17 @@
 > logging, idempotency), **tests**, and a **measured before/after** — so you can see exactly
 > what gets automated and exactly how it's built.
 
-### ▶ Try the live demo
+### ▶ Try it live
 
-**[Open `index.html`](index.html) in your browser** — no install, no server. Type in a lead and
-watch the automation score and route it in real time (the same logic as the Python pipeline).
-Just download the repo and double-click the file.
+**[Open `index.html`](index.html) in your browser** — no install, no server. Tabbed, interactive
+demos for **all five** automations: enter a lead, a won deal, usage lines, a support message, or
+KPIs and watch the real engine run — the same logic as the Python, ported to JS and verified to
+match exactly. Download the repo and double-click the file, or open the hosted version:
+
+🔗 **Hosted demo:** https://raw.githack.com/danieaneta/business-automation-playbook/main/index.html
 
 Most "automation" portfolios show a screenshot of a Zapier canvas. This one ships inspectable,
-testable, self-hostable systems. Clone it, run it on the included dummy data, and read the code.
+testable, self-hostable systems with live demos, a deployable API, and real-data validation.
 
 ---
 
@@ -57,6 +60,33 @@ integrations, but nothing external is required to see it work.
 
 ---
 
+## Live API
+
+All five engines are also exposed as a free, zero-dependency serverless API (**Netlify
+Functions**) — full reference in **[API.md](API.md)**. Endpoints return JSON with CORS enabled,
+ready to call from a portfolio site:
+
+```
+POST /api/lead-score      POST /api/onboarding-run    POST /api/invoice-build
+POST /api/ticket-route    POST /api/report-build
+```
+
+The handlers are a verified 1:1 port of the Python; deploy by pointing a Netlify site at this repo.
+
+---
+
+## Validated against real open data
+
+The Python engines are checked against real public datasets in **[`validate/`](validate/)** —
+run either with `python validate.py`:
+
+| Harness | Dataset | What it proves |
+|---------|---------|----------------|
+| [`validate/03-invoicing`](validate/03-invoicing/) | UCI Online Retail II (real transactions) | Invoice math reconciles within $0.01; messy rows skipped with logged reasons |
+| [`validate/04-support-routing`](validate/04-support-routing/) | CFPB Consumer Complaints | Routing-match accuracy on labeled complaints (honest taxonomy caveats) |
+
+---
+
 ## How each blueprint is organized
 
 ```
@@ -71,6 +101,20 @@ NN-blueprint-name/
 
 The `shared/` package holds the reusable engineering layer every blueprint depends on:
 retry-with-backoff, structured JSON logging, and an idempotent store interface.
+
+And at the repo root:
+
+```
+business-automation-playbook/
+├── 01..05-*/           ← the five blueprints (Python + n8n workflow + tests)
+├── shared/             ← reusable retry / logging / idempotent-store layer
+├── index.html          ← interactive browser demos for all five (no server)
+├── netlify/functions/  ← serverless API (Netlify Functions) — see API.md
+├── validate/           ← real-data validation harnesses (03 + 04)
+├── docs/               ← walkthroughs, diagrams, social preview
+├── docker-compose.yml  ← self-host n8n in one command
+└── SESSIONS.md         ← changelog of what was built each session
+```
 
 ---
 

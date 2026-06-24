@@ -2,6 +2,14 @@
 
 Supporting material for the playbook.
 
+## Map of the project
+
+- **Blueprints** — `01..05-*/`, each with its own README (Problem → Fix → Results → proof).
+- **Live demos** — [`../index.html`](../index.html): interactive, in-browser demos for all five.
+- **API** — [`../API.md`](../API.md): the serverless API (Netlify Functions) reference + deploy steps.
+- **Validation** — [`../validate/`](../validate/): real-data harnesses for blueprints 03 and 04.
+- **Session log** — [`../SESSIONS.md`](../SESSIONS.md): changelog of what was built each session.
+
 ## Walkthrough recordings
 
 Each flagship blueprint gets a ~90-second screen recording (problem → run → result). Drop the
